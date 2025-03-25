@@ -4,7 +4,6 @@ import { useDropzone } from 'react-dropzone';
 export function PantallaPrincipal() {
   const [firstImage, setFirstImage] = useState();
   const [secondImage, setSecondImage] = useState();
-  const [imageData, setImageData] = useState(null); 
 
   const onDrop = useCallback((acceptedFiles) => {
     setFirstImage(acceptedFiles[0]);
@@ -34,8 +33,6 @@ export function PantallaPrincipal() {
     
     const datapp = await resApp.json();
     if (datapp && datapp.id && datapp.hexadecimal) {
-      setImageData(datapp);
-      console.log("Imagen guardada en la base de datos:", datapp);
     } else {
       alert("Hubo un problema al guardar la imagen.");
       return;
@@ -108,15 +105,6 @@ export function PantallaPrincipal() {
                 height: '300px',
               }}
             />
-          </div>
-        )}
-
-        {imageData && (
-          <div>
-            <h4>Datos de la imagen almacenada:</h4>
-            <p><strong>ID:</strong> {imageData.id}</p>
-            <p><strong>Nombre de la imagen:</strong> {imageData.name}</p>
-            <p><strong>Formato hexadecimal:</strong> {imageData.hexadecimal}</p>
           </div>
         )}
 
