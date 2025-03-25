@@ -4,6 +4,7 @@ import { useDropzone } from 'react-dropzone';
 export function PantallaPrincipal() {
   const [firstImage, setFirstImage] = useState();
   const [secondImage, setSecondImage] = useState();
+  const [imageData, setImageData] = useState(null); 
 
   const onDrop = useCallback((acceptedFiles) => {
     setFirstImage(acceptedFiles[0]);
@@ -11,54 +12,36 @@ export function PantallaPrincipal() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    multiple: false, 
+    multiple: false,
     accept: 'image/*',
   });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!firstImage) {
-      console.log('No image selected');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', firstImage);
-    formData.append('upload_preset', 'ml_default');
-    formData.append('api_key', '536368137275945');
-
-    const res = await fetch('https://api.cloudinary.com/v1_1/dlvi9wdaa/image/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    console.log(data);
-  };
 
   const conexionIA = async (e) => {
     e.preventDefault();
 
     if (!firstImage) {
-      console.log('No image uploaded yet');
+      alert("No has seleccionado ningún archivo.");
       return;
     }
-
    
     const formData = new FormData();
     formData.append('file', firstImage);
-    formData.append('upload_preset', 'ml_default');
-    formData.append('api_key', '536368137275945');
     
-    const cloudinaryRes = await fetch('https://api.cloudinary.com/v1_1/dlvi9wdaa/image/upload', {
+    const resApp = await fetch('https://api-ia-db.onrender.com/images/upload', {
       method: 'POST',
       body: formData,
     });
-
-    const cloudinaryData = await cloudinaryRes.json();
-    const imageUrl = cloudinaryData.secure_url; 
-
     
+    const datapp = await resApp.json();
+    if (datapp && datapp.id && datapp.hexadecimal) {
+      setImageData(datapp);
+      console.log("Imagen guardada en la base de datos:", datapp);
+    } else {
+      alert("Hubo un problema al guardar la imagen.");
+      return;
+    }
+
+    const imageUrl = `https://api-ia-db.onrender.com/images/${datapp.id}`;
     const res = await fetch('http://127.0.0.1:5000/transform', {
       method: 'POST',
       headers: {
@@ -70,12 +53,16 @@ export function PantallaPrincipal() {
     });
 
     const data = await res.json();
-    setSecondImage(`data:image/png;base64,${data.image}`);
+    if (data.image && data.image.startsWith('data:image/png;base64,')) {
+      setSecondImage(data.image);
+    } else {
+      alert("La imagen modificada no tiene el formato correcto.");
+    }
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={conexionIA}>
         <div
           {...getRootProps()}
           style={{
@@ -121,6 +108,15 @@ export function PantallaPrincipal() {
                 height: '300px',
               }}
             />
+          </div>
+        )}
+
+        {imageData && (
+          <div>
+            <h4>Datos de la imagen almacenada:</h4>
+            <p><strong>ID:</strong> {imageData.id}</p>
+            <p><strong>Nombre de la imagen:</strong> {imageData.name}</p>
+            <p><strong>Formato hexadecimal:</strong> {imageData.hexadecimal}</p>
           </div>
         )}
 
