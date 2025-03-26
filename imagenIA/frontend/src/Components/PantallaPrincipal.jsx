@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 export function PantallaPrincipal() {
 
   const API_URL = "https://api-ia-db.onrender.com";
+  const IA_URL = "https://backendia-mrgb.onrender.com";
   const [firstImage, setFirstImage] = useState();
   const [secondImage, setSecondImage] = useState();
   let respApp, respIA;
@@ -31,7 +32,7 @@ export function PantallaPrincipal() {
           formData.append("file", firstImage);
 
           await fetch(`${API_URL}/images/upload`, {
-              method: 'POST',
+              method: "POST",
               body: formData
           })
           .then(response => response.json())
@@ -46,10 +47,10 @@ export function PantallaPrincipal() {
           }
           const imageUrl = `${API_URL}/images/${respApp.id}`;
 
-          await fetch('http://127.0.0.1:5000/transform', {
+          await fetch(`${IA_URL}/transform`, {
               method: 'POST',
               headers: {
-                  'Content-Type': 'application/json'
+                  "Content-Type": "application/json"
               },
               body: JSON.stringify({
                   url: imageUrl
@@ -60,37 +61,14 @@ export function PantallaPrincipal() {
             respIA = data;
           })
 
-          if (respIA.image && respIA.image.startsWith('data:image/png;base64,')) {
+          if (respIA.image && respIA.image.startsWith("data:image/png;base64,")) {
               setSecondImage(respIA.image);
           } else {
-              alert('La imagen modificada no tiene el formato correcto.');
+              alert("La imagen modificada no tiene el formato correcto.");
           }
       } catch (error) {
         throw new Error("Error: ", error);
       }
-<<<<<<< Updated upstream
-=======
-      const imageUrl = `https://api-ia-db.onrender.com/images/${datapp.id}`;
-
-      const res = await fetch("https://backendia-mrgb.onrender.com/transform", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: imageUrl }),
-      });
-
-      const data = await res.json();
-      if (data.image && data.image.startsWith("data:image/png;base64,")) {
-        setSecondImage(data.image);
-      } else {
-        alert("La imagen modificada no tiene el formato correcto.");
-      }
-    } catch (error) {
-      console.error("Error en la conexión con la IA:", error);
-      alert("Hubo un error al procesar la imagen.");
-    }
->>>>>>> Stashed changes
   };
 
   return (
