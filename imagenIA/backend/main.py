@@ -3,30 +3,13 @@ import numpy as np
 import requests
 import cv2
 import base64
-
-BASE_URL = 'https://api-ia-db.onrender.com/images/list'
-IMAGE_URL_TEMPLATE = 'https://api-ia-db.onrender.com/images/{}'
+from flask_cors import CORS
 
 app = Flask(__name__)
 
-def get_latest_image_url():
-    try:
-        response = requests.get(BASE_URL)
-        response.raise_for_status()
-        
-        images = response.json()
-        if images and isinstance(images, list) and len(images) > 0:
-            latest_image = images[-1]
-            latest_id = latest_image.get('id')
-            if latest_id:
-                return IMAGE_URL_TEMPLATE.format(latest_id)
-        
-        print("No se encontró una imagen válida en la API.")
-    except requests.RequestException as e:
-        print(f"Error al obtener la última imagen: {e}")
-    return None
+CORS(app, resources={r"/": {"origins": ""}})
 
-def transform_image(url, show_image=False):
+def transform_image(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -45,12 +28,7 @@ def transform_image(url, show_image=False):
 
         img_base64 = base64.b64encode(buffer).decode('utf-8')
 
-        if show_image:
-            cv2.imshow("Última Imagen", img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-
-        return {"image": img_base64, "message": "Imagen en Base64"}, 200
+        return {"image": f"data:image/png;base64,{img_base64}"}, 200
 
     except requests.RequestException as e:
         return {"error": f"Error al descargar la imagen: {e}"}, 400
@@ -59,9 +37,8 @@ def transform_image(url, show_image=False):
 
 @app.route('/transform', methods=['POST'])
 def image_result():
-    """Endpoint para procesar una imagen desde una URL enviada en el body."""
     data = request.get_json(force=True)
-    
+
     if 'url' not in data:
         return jsonify({"error": "Falta la URL en el JSON"}), 400
 
@@ -70,10 +47,5 @@ def image_result():
 
     return jsonify(response), status_code
 
-if __name__ == '__main__':
-    latest_image_url = get_latest_image_url()
-    if latest_image_url:
-        transform_image(latest_image_url, show_image=True)
-    else:
-        print("No se pudo obtener la última imagen.")
-    app.run(debug=True)
+if __name__ == 'main':
+    app.run(debug=True, host="0.0.0.0", port=5000)
