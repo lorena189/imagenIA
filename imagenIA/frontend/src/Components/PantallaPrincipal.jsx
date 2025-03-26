@@ -21,7 +21,7 @@ export function PantallaPrincipal() {
   const conexionIA = async (e) => {
       e.preventDefault();
 
-      try {
+     
           if (!firstImage) {
               alert("No has seleccionado ningún archivo.");
               return;
@@ -30,6 +30,7 @@ export function PantallaPrincipal() {
           const formData = new FormData();
           formData.append("file", firstImage);
 
+      try {
           await fetch(`${API_URL}/images/upload`, {
               method: 'POST',
               body: formData
@@ -46,20 +47,17 @@ export function PantallaPrincipal() {
           }
           const imageUrl = `${API_URL}/images/${respApp.id}`;
 
-          await fetch('http://127.0.0.1:5000/transform', {
-              method: 'POST',
+          const res = await fetch("https://backendia-mrgb.onrender.com/transform", {
+              method: "POST",
               headers: {
-                  'Content-Type': 'application/json'
+                  "Content-Type": "application/json",
               },
-              body: JSON.stringify({
-                  url: imageUrl
-              })
-          })
-          .then(response => response.json())
-          .then(data => {
+              body: JSON.stringify({ url: imageUrl }),
+          });
+        .then(response => response.json())
+        .then(data => {
             respIA = data;
-          })
-
+        })
           if (respIA.image && respIA.image.startsWith('data:image/png;base64,')) {
               setSecondImage(respIA.image);
           } else {
