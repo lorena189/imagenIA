@@ -2,8 +2,11 @@ import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
 export function PantallaPrincipal() {
-  const [firstImage, setFirstImage] = useState(null);
-  const [secondImage, setSecondImage] = useState(null);
+
+  const API_URL = "https://api-ia-db.onrender.com";
+  const [firstImage, setFirstImage] = useState();
+  const [secondImage, setSecondImage] = useState();
+  let respApp, respIA;
 
   const onDrop = useCallback((acceptedFiles) => {
     setFirstImage(acceptedFiles[0]);
@@ -16,47 +19,55 @@ export function PantallaPrincipal() {
   });
 
   const conexionIA = async (e) => {
-    e.preventDefault();
+      e.preventDefault();
 
-    if (!firstImage) {
-      alert("No has seleccionado ningún archivo.");
-      return;
-    }
+      try {
+          if (!firstImage) {
+              alert("No has seleccionado ningún archivo.");
+              return;
+          }
 
-    const formData = new FormData();
-    formData.append("file", firstImage);
+          const formData = new FormData();
+          formData.append("file", firstImage);
 
-    try {
-      const resApp = await fetch("https://api-ia-db.onrender.com/images/upload", {
-        method: "POST",
-        body: formData,
-      });
+          await fetch(`${API_URL}/images/upload`, {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            respApp = data;
+          })
+          .catch(error => Error("Error: ", error));
 
-      const datapp = await resApp.json();
-      if (!datapp || !datapp.id) {
-        alert("Hubo un problema al guardar la imagen.");
-        return;
+          if (!respApp || !respApp.id) {
+              alert("Hubo un problema al guardar la imagen.");
+              return;
+          }
+          const imageUrl = `${API_URL}/images/${respApp.id}`;
+
+          await fetch('http://127.0.0.1:5000/transform', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  url: imageUrl
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+            respIA = data;
+          })
+
+          if (respIA.image && respIA.image.startsWith('data:image/png;base64,')) {
+              setSecondImage(respIA.image);
+          } else {
+              alert('La imagen modificada no tiene el formato correcto.');
+          }
+      } catch (error) {
+        throw new Error("Error: ", error);
       }
-      const imageUrl = `https://api-ia-db.onrender.com/images/${datapp.id}`;
-
-      const res = await fetch("http://127.0.0.1:5000/transform", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: imageUrl }),
-      });
-
-      const data = await res.json();
-      if (data.image && data.image.startsWith("data:image/png;base64,")) {
-        setSecondImage(data.image);
-      } else {
-        alert("La imagen modificada no tiene el formato correcto.");
-      }
-    } catch (error) {
-      console.error("Error en la conexión con la IA:", error);
-      alert("Hubo un error al procesar la imagen.");
-    }
   };
 
   return (
