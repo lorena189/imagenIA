@@ -10,6 +10,7 @@ export function PantallaPrincipal() {
   let respApp, respIA;
 
   const onDrop = useCallback((acceptedFiles) => {
+    setSecondImage(null);
     setFirstImage(acceptedFiles[0]);
   }, []);
 
@@ -78,49 +79,82 @@ export function PantallaPrincipal() {
         <div
           {...getRootProps()}
           style={{
-            background: "#e3e3e3",
-            padding: "20px",
-            border: "2px dashed #000",
+            background: "#f0f0f0",
+            padding: "30px",
+            border: "2px dashed #007bff",
+            borderRadius: "8px",
             cursor: "pointer",
-            marginBottom: "20px",
+            transition: "background 0.3s ease",
+            marginBottom: "30px",
+            width: "80%",
+            maxWidth: "500px",
+            marginLeft: "auto",
+            marginRight: "auto",
           }}
         >
           <input {...getInputProps()} />
-          {isDragActive ? <p>Suelta la imagen aquí...</p> : <p>Arrastra y suelta una imagen aquí, o haz clic para seleccionarla</p>}
+          {isDragActive ? (
+            <p style={{ fontSize: "16px", color: "#007bff" }}>Suelta la imagen aquí...</p>
+          ): ( 
+            <p style={{ fontSize: "16px", color: "#333" }}>
+              Arrastra y suelta una imagen aquí, o haz clic para seleccionarla
+            </p>
+          )}
+          
         </div>
 
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px", flexWrap: "wrap" }}></div>
         {/*imagen original */}
         {firstImage && (
-          <img
-            src={URL.createObjectURL(firstImage)}
-            alt="Imagen subida"
-            style={{
-              width: "300px",
-              height: "300px",
-              display: "block",
-              margin: "10px auto",
-            }}
-          />
-        )}
-
-        {/*imagen procesada */}
-        {secondImage && (
-          <div style={{ background: "#e3e3e3", padding: "20px", marginBottom: "20px" }}>
+          <div style={{ textAlign: "center" }}>
             <img
-              src={secondImage}
-              alt="Imagen modificada"
+              src={URL.createObjectURL(firstImage)}
+              alt="Imagen subida"
               style={{
                 width: "300px",
                 height: "300px",
+                objectFit: "cover", 
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             />
           </div>
         )}
 
-        <button type="submit" style={{ padding: "10px 20px", cursor: "pointer" }}>
-          Convertir a blanco y negro
+        {/*imagen procesada */}
+        {secondImage && (
+          <div style={{ textAlign: "center"  }}>
+            <img
+              src={secondImage}
+              alt="Imagen modificada"
+              style={{
+                width: "300px",
+                objectFit: "cover", 
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+          </div>
+        )}
+
+        <button 
+        type="submit" 
+        style={{ 
+          padding: "10px 20px", 
+          cursor: "pointer",
+          backgroundColor: "#007bff",
+          color: "ffff",
+          border: "none",
+          borderRadius: "5px",
+          fontSize: "16px",
+          transition: "background-color 0.3s",
+          marginTop: "20px",
+          }}
+        >
+          Presiona para convertir la imagen a a blanco y negro
         </button>
       </form>
     </div>
   );
 }
+
