@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 
 export function PantallaPrincipal() {
     const DB_URL = 'https://api-ia-db.onrender.com';
-    const IA_URL = 'http://127.0.0.1:5000';
+    const IA_URL = 'https://backendia-x3sb.onrender.com/';
     const [firstImage, setFirstImage] = useState();
     const [secondImage, setSecondImage] = useState();
     let respApp, respIA;
