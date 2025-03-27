@@ -118,6 +118,7 @@ export function PantallaPrincipal() {
                             />
                         </div>
                     )}
+                    
 
                     {/* imagen procesada */}
                     {secondImage && (
