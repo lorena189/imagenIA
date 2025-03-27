@@ -3,8 +3,8 @@ import { useDropzone } from "react-dropzone";
 
 export function PantallaPrincipal() {
 
-  const API_URL = "https://api-ia-db.onrender.com";
-  const IA_URL = "https://backendia-mrgb.onrender.com";
+  const DB_URL = "https://api-ia-db.onrender.com";
+  const IA_URL = "https://backendia-x3sb.onrender.com/";
   const [firstImage, setFirstImage] = useState();
   const [secondImage, setSecondImage] = useState();
   let respApp, respIA;
@@ -31,7 +31,7 @@ export function PantallaPrincipal() {
           const formData = new FormData();
           formData.append("file", firstImage);
 
-          await fetch(`${API_URL}/images/upload`, {
+          await fetch(`${DB_URL}/images/upload`, {
               method: "POST",
               body: formData
           })
@@ -45,7 +45,7 @@ export function PantallaPrincipal() {
               alert("Hubo un problema al guardar la imagen.");
               return;
           }
-          const imageUrl = `${API_URL}/images/${respApp.id}`;
+          const imageUrl = `${DB_URL}/images/${respApp.id}`;
 
           await fetch(`${IA_URL}/transform`, {
               method: 'POST',
