@@ -1,6 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
+/**
+ * Componente principal de la aplicación que permite subir una imagen, enviarla a una IA que modifica sus propiedades y mostrarla nuevamente en este mismo.
+ *
+ * @returns {JSX.Element} Componente de la pantalla principal que muestra la imagen original y la imagen procesada.
+ */
 export function PantallaPrincipal() {
     const DB_URL = 'https://api-ia-db.onrender.com';
     const IA_URL = 'https://backendia-x3sb.onrender.com/';
@@ -8,6 +13,11 @@ export function PantallaPrincipal() {
     const [secondImage, setSecondImage] = useState();
     let respApp, respIA;
 
+    /**
+     * Maneja la carga de imagenes y actualiza el estado con la primer imagen subida.
+     *
+     * @param {File[]} acceptedFiles - Lista de archivos aceptados.
+     */
     const onDrop = useCallback((acceptedFiles) => {
         setSecondImage(null);
         setFirstImage(acceptedFiles[0]);
@@ -19,6 +29,12 @@ export function PantallaPrincipal() {
         accept: 'image/*'
     });
 
+    /**
+     * Establece la conexión con la IA que se encargara de procesar la imagen a modificar y obtener la imagen modifica como respuesta.
+     *
+     * @param {Event} e - Variable del tipo Object Event que permite acceder a las acciones del usuario.
+     * @return {Promise{Blob}} - El archivo Blob de la imagen devuelta.
+     */
     const conexionIA = async (e) => {
         e.preventDefault();
 
@@ -46,7 +62,6 @@ export function PantallaPrincipal() {
                 return;
             }
             const imageUrl = `${DB_URL}/images/${respApp.id}`;
-
             await fetch(`${IA_URL}/transform`, {
                 method: 'POST',
                 headers: {
@@ -102,7 +117,7 @@ export function PantallaPrincipal() {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                    {/* imagen original */}
+                    {/* Imagen original */}
                     {firstImage && (
                         <div style={{ textAlign: 'center' }}>
                             <img
@@ -118,9 +133,8 @@ export function PantallaPrincipal() {
                             />
                         </div>
                     )}
-                    
 
-                    {/* imagen procesada */}
+                    {/* Imagen procesada */}
                     {secondImage && (
                         <div style={{ textAlign: 'center' }}>
                             <img
